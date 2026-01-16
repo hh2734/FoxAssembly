@@ -8,7 +8,7 @@
 
 _config = {
 	package = "fxas.foxbox.app",
-	version = 2.12,
+	version = 2.13,
 	path = arg[0]:gsub("FoxBox.lua$","").."FoxAssembly",
 	deps = nil
 }
@@ -169,7 +169,7 @@ if mc(op, "new", "-n") then
 	local time = 0
 	if os then time = os.time() end
 	local dummy_pkg = is_app and dummy_app or dummy_lib
-	f:write(is_app and dummy_pkg:format(pkg, tostring(_config.version), tostring(Fox._VERSION), time, DocType_VERSION, pkg, pkg, pkg) or dummy_pkg:format(pkg, tostring(_config.version), tostring(Fox._VERSION), time, DocType_VERSION, pkg, pkg))
+	f:write(is_app and dummy_pkg:format(pkg, tostring(_config.version), tostring(Fox._VERSION), time, DocType_VERSION, pkg, pkg, pkg:gsub(pkg, pkg:gsub("%.", "_"))) or dummy_pkg:format(pkg, tostring(_config.version), tostring(Fox._VERSION), time, DocType_VERSION, pkg, pkg))
 	f:close()
 	print("Success!")
 elseif mc(op, "remove", "-r", "rm") then
