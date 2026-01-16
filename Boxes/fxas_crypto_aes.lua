@@ -1,0 +1,388 @@
+-- Error in library: fxas.crypto.aes >
+-- FoxBox version: 2.1
+-- fox.lua version: 1.0
+-- Unix time: 1768584162
+-- DocType version: Beta X1
+--> ============  METADATA  ============ <--
+
+
+local Box = {}
+Box._config = {
+	package = "fxas.crypto.aes", -- Your package name
+	version = 1.0, -- fxas.crypto.aes version
+	deps = nil
+}
+--> ============   CONFIG   ============ <--
+
+
+syslib = ...
+if type(syslib) ~= "table" then
+	return Box
+end
+
+--> ============   SYSLIB   ============ <--
+--------------------------------------------
+--> ============ YOUR CODE: ============ <--
+
+local function randstr(length)
+	local res = ""
+	for i = 1, length do
+		res = res .. string.char(math.random(0, 255))
+	end
+	return res
+end
+
+local SBox = {
+	[0] = 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+	0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+	0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+	0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+	0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+	0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+	0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+	0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+	0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+	0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+	0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+	0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+	0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+	0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+	0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+}
+
+local InvSBox = {
+	[0] = 0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
+	0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
+	0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
+	0x08, 0x2e, 0xa1, 0x66, 0x28, 0xd9, 0x24, 0xb2, 0x76, 0x5b, 0xa2, 0x49, 0x6d, 0x8b, 0xd1, 0x25,
+	0x72, 0xf8, 0xf6, 0x64, 0x86, 0x68, 0x98, 0x16, 0xd4, 0xa4, 0x5c, 0xcc, 0x5d, 0x65, 0xb6, 0x92,
+	0x6c, 0x70, 0x48, 0x50, 0xfd, 0xed, 0xb9, 0xda, 0x5e, 0x15, 0x46, 0x57, 0xa7, 0x8d, 0x9d, 0x84,
+	0x90, 0xd8, 0xab, 0x00, 0x8c, 0xbc, 0xd3, 0x0a, 0xf7, 0xe4, 0x58, 0x05, 0xb8, 0xb3, 0x45, 0x06,
+	0xd0, 0x2c, 0x1e, 0x8f, 0xca, 0x3f, 0x0f, 0x02, 0xc1, 0xaf, 0xbd, 0x03, 0x01, 0x13, 0x8a, 0x6b,
+	0x3a, 0x91, 0x11, 0x41, 0x4f, 0x67, 0xdc, 0xea, 0x97, 0xf2, 0xcf, 0xce, 0xf0, 0xb4, 0xe6, 0x73,
+	0x96, 0xac, 0x74, 0x22, 0xe7, 0xad, 0x35, 0x85, 0xe2, 0xf9, 0x37, 0xe8, 0x1c, 0x75, 0xdf, 0x6e,
+	0x47, 0xf1, 0x1a, 0x71, 0x1d, 0x29, 0xc5, 0x89, 0x6f, 0xb7, 0x62, 0x0e, 0xaa, 0x18, 0xbe, 0x1b,
+	0xfc, 0x56, 0x3e, 0x4b, 0xc6, 0xd2, 0x79, 0x20, 0x9a, 0xdb, 0xc0, 0xfe, 0x78, 0xcd, 0x5a, 0xf4,
+	0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31, 0xb1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xec, 0x5f,
+	0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef,
+	0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
+	0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
+}
+
+local function sub_word(word)
+	return {
+		SBox[word[1]],
+		SBox[word[2]],
+		SBox[word[3]],
+		SBox[word[4]]
+	}
+end
+
+local function rot_word(word)
+	return {word[2], word[3], word[4], word[1]}
+end
+
+local Rcon = {
+	[1] = 0x01, [2] = 0x02, [3] = 0x04, [4] = 0x08, [5] = 0x10,
+	[6] = 0x20, [7] = 0x40, [8] = 0x80, [9] = 0x1b, [10] = 0x36,
+	[11] = 0x6c, [12] = 0xd8, [13] = 0xab, [14] = 0x4d, [15] = 0x9a
+}
+
+local function key_expansion(key)
+	local key_schedule = {}
+	local nk = 8
+	local nb = 4
+	local nr = 14
+	for i = 1, nk do
+		key_schedule[i] = {
+			key[(i-1)*4 + 1] or 0,
+			key[(i-1)*4 + 2] or 0,
+			key[(i-1)*4 + 3] or 0,
+			key[(i-1)*4 + 4] or 0
+		}
+	end
+	for i = nk + 1, nb * (nr + 1) do
+		local temp = {}
+		for j = 1, 4 do
+			temp[j] = key_schedule[i-1][j]
+		end
+		
+		if i % nk == 0 then
+			temp = sub_word(rot_word(temp))
+			temp[1] = temp[1] ~ Rcon[math.floor(i / nk)]
+		elseif nk > 6 and i % nk == 4 then
+			temp = sub_word(temp)
+		end
+		
+		key_schedule[i] = {}
+		for j = 1, 4 do
+			key_schedule[i][j] = key_schedule[i - nk][j] ~ temp[j]
+		end
+	end
+	
+	return key_schedule
+end
+
+local function bytes_to_hex(bytes)
+	local hex = {}
+	for i = 1, #bytes do
+		hex[i] = string.format("%02x", bytes[i])
+	end
+	return table.concat(hex)
+end
+
+local function hex_to_bytes(hex)
+	local bytes = {}
+	for i = 1, #hex, 2 do
+		local byte = tonumber(hex:sub(i, i+1), 16)
+		table.insert(bytes, byte)
+	end
+	return bytes
+end
+
+local function sub_bytes(state)
+	for i = 1, 4 do
+		for j = 1, 4 do
+			state[i][j] = SBox[state[i][j]]
+		end
+	end
+	return state
+end
+
+local function inv_sub_bytes(state)
+	for i = 1, 4 do
+		for j = 1, 4 do
+			state[i][j] = InvSBox[state[i][j]]
+		end
+	end
+	return state
+end
+
+local function shift_rows(state)
+	local new_state = {}
+	for i = 1, 4 do
+		new_state[i] = {}
+		for j = 1, 4 do
+			new_state[i][j] = state[i][(j + i - 2) % 4 + 1]
+		end
+	end
+	return new_state
+end
+
+local function inv_shift_rows(state)
+	local new_state = {}
+	for i = 1, 4 do
+		new_state[i] = {}
+		for j = 1, 4 do
+			new_state[i][j] = state[i][(j - i + 4) % 4 + 1]
+		end
+	end
+	return new_state
+end
+
+local function gf_mult(a, b)
+	local p = 0
+	for _ = 1, 8 do
+		if b & 1 ~= 0 then
+			p = p ~ a
+		end
+		local hi_bit = a & 0x80
+		a = (a << 1) & 0xFF
+		if hi_bit ~= 0 then
+			a = a ~ 0x1B
+		end
+		b = b >> 1
+	end
+	return p
+end
+
+local function mix_columns(state)
+	for i = 1, 4 do
+		local a, b, c, d = state[i][1], state[i][2], state[i][3], state[i][4]
+		
+		state[i][1] = gf_mult(a, 2) ~ gf_mult(b, 3) ~ c ~ d
+		state[i][2] = a ~ gf_mult(b, 2) ~ gf_mult(c, 3) ~ d
+		state[i][3] = a ~ b ~ gf_mult(c, 2) ~ gf_mult(d, 3)
+		state[i][4] = gf_mult(a, 3) ~ b ~ c ~ gf_mult(d, 2)
+	end
+	return state
+end
+
+local function inv_mix_columns(state)
+	for i = 1, 4 do
+		local a, b, c, d = state[i][1], state[i][2], state[i][3], state[i][4]
+		
+		state[i][1] = gf_mult(a, 0x0e) ~ gf_mult(b, 0x0b) ~ gf_mult(c, 0x0d) ~ gf_mult(d, 0x09)
+		state[i][2] = gf_mult(a, 0x09) ~ gf_mult(b, 0x0e) ~ gf_mult(c, 0x0b) ~ gf_mult(d, 0x0d)
+		state[i][3] = gf_mult(a, 0x0d) ~ gf_mult(b, 0x09) ~ gf_mult(c, 0x0e) ~ gf_mult(d, 0x0b)
+		state[i][4] = gf_mult(a, 0x0b) ~ gf_mult(b, 0x0d) ~ gf_mult(c, 0x09) ~ gf_mult(d, 0x0e)
+	end
+	return state
+end
+
+local function add_round_key(state, round_key)
+	for i = 1, 4 do
+		for j = 1, 4 do
+			state[i][j] = state[i][j] ~ round_key[i][j]
+		end
+	end
+	return state
+end
+
+local function bytes_to_state(bytes)
+	local state = {}
+	for i = 1, 4 do
+		state[i] = {}
+		for j = 1, 4 do
+			state[i][j] = bytes[(j-1)*4 + i] or 0
+		end
+	end
+	return state
+end
+
+local function state_to_bytes(state)
+	local bytes = {}
+	for j = 1, 4 do
+		for i = 1, 4 do
+			table.insert(bytes, state[i][j])
+		end
+	end
+	return bytes
+end
+
+local function encrypt_block(block, key_schedule)
+	local state = bytes_to_state(block)
+	local nr = 14
+	state = add_round_key(state, {key_schedule[1], key_schedule[2], key_schedule[3], key_schedule[4]})
+	for round = 1, nr - 1 do
+		state = sub_bytes(state)
+		state = shift_rows(state)
+		state = mix_columns(state)
+		local round_key = {
+			key_schedule[round*4 + 1],
+			key_schedule[round*4 + 2],
+			key_schedule[round*4 + 3],
+			key_schedule[round*4 + 4]
+		}
+		state = add_round_key(state, round_key)
+	end
+	state = sub_bytes(state)
+	state = shift_rows(state)
+	local round_key = {
+		key_schedule[nr*4 + 1],
+		key_schedule[nr*4 + 2],
+		key_schedule[nr*4 + 3],
+		key_schedule[nr*4 + 4]
+	}
+	state = add_round_key(state, round_key)
+	
+	return state_to_bytes(state)
+end
+
+local function decrypt_block(block, key_schedule)
+	local state = bytes_to_state(block)
+	local nr = 14
+	local round_key = {
+		key_schedule[nr*4 + 1],
+		key_schedule[nr*4 + 2],
+		key_schedule[nr*4 + 3],
+		key_schedule[nr*4 + 4]
+	}
+	state = add_round_key(state, round_key)
+	for round = nr - 1, 1, -1 do
+		state = inv_shift_rows(state)
+		state = inv_sub_bytes(state)
+		round_key = {
+			key_schedule[round*4 + 1],
+			key_schedule[round*4 + 2],
+			key_schedule[round*4 + 3],
+			key_schedule[round*4 + 4]
+		}
+		state = add_round_key(state, round_key)
+		state = inv_mix_columns(state)
+	end
+	state = inv_shift_rows(state)
+	state = inv_sub_bytes(state)
+	round_key = {
+		key_schedule[1],
+		key_schedule[2],
+		key_schedule[3],
+		key_schedule[4]
+	}
+	state = add_round_key(state, round_key)
+	
+	return state_to_bytes(state)
+end
+
+function Box.encrypt(plaintext, key)
+	local key_bytes = {}
+	for i = 1, 32 do
+		key_bytes[i] = string.byte(key, i) or 0
+	end
+	local key_schedule = key_expansion(key_bytes)
+	local plaintext_bytes = {}
+	for i = 1, #plaintext do
+		plaintext_bytes[i] = string.byte(plaintext, i)
+	end
+	local block_size = 16
+	local padding = block_size - (#plaintext_bytes % block_size)
+	for i = 1, padding do
+		table.insert(plaintext_bytes, padding)
+	end
+	local ciphertext_bytes = {}
+	for i = 1, #plaintext_bytes, block_size do
+		local block = {}
+		for j = 1, block_size do
+			block[j] = plaintext_bytes[i + j - 1]
+		end
+		local encrypted_block = encrypt_block(block, key_schedule)
+		for j = 1, block_size do
+			table.insert(ciphertext_bytes, encrypted_block[j])
+		end
+	end
+	
+	return bytes_to_hex(ciphertext_bytes)
+end
+
+function Box.decrypt(ciphertext_hex, key)
+	local key_bytes = {}
+	for i = 1, 32 do
+		key_bytes[i] = string.byte(key, i) or 0
+	end
+	
+	local key_schedule = key_expansion(key_bytes)
+	local ciphertext_bytes = hex_to_bytes(ciphertext_hex)
+	
+	local plaintext_bytes = {}
+	local block_size = 16
+	
+	for i = 1, #ciphertext_bytes, block_size do
+		local block = {}
+		for j = 1, block_size do
+			block[j] = ciphertext_bytes[i + j - 1]
+		end
+		local decrypted_block = decrypt_block(block, key_schedule)
+		for j = 1, block_size do
+			table.insert(plaintext_bytes, decrypted_block[j])
+		end
+	end
+	local padding = plaintext_bytes[#plaintext_bytes]
+	for i = 1, padding do
+		table.remove(plaintext_bytes)
+	end
+	
+	local plaintext = ""
+	for i = 1, #plaintext_bytes do
+		plaintext = plaintext .. string.char(plaintext_bytes[i])
+	end
+	
+	return plaintext
+end
+
+function Box.key(seed)
+	math.randomseed(seed)
+	return randstr(32)
+end
+
+return Box
