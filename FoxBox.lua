@@ -194,7 +194,9 @@ elseif mc(op, "remove", "-r", "rm") then
 		end
 	end
 	if pkg:sub(-1, -1) == "%." then return err() end
-	--if pkg:sub(1, 5) == "fxas." then return print("'fxas.' is reserved!") end
+	local is_dev
+	for k, v in pairs(arg) do if mc(v, "-d", "dev") then is_dev = true end end
+	if pkg:sub(1, 5) == "fxas." and not is_dev then return print("'fxas.' is reserved!") end
 	if os then
 		if not os.remove(_config.path.."/packages/"..pkg:gsub("%.", "_")..".lua") then
 			return print("Package "..pkg.." is not installed!")
