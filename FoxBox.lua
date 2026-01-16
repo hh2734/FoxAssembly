@@ -8,7 +8,7 @@
 
 _config = {
 	package = "fxas.foxbox.app",
-	version = 2.11,
+	version = 2.12,
 	path = arg[0]:gsub("FoxBox.lua$","").."FoxAssembly",
 	deps = nil
 }
@@ -125,7 +125,7 @@ _config = {
 
 
 
-return 1
+return 0
 ]]
 
 
@@ -211,4 +211,4 @@ else
 end
 
 
-return 1
+return 0
