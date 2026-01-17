@@ -1,6 +1,6 @@
 local fox = {}
 
-fox._VERSION = 1.0
+fox._VERSION = 1.1
 
 local printr
 local path

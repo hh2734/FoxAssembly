@@ -161,7 +161,7 @@ local function decompress(input)
 	return tconcat(result)
 end
 
-package.compress = compress
-package.decompress = decompress
+Box.compress = compress
+Box.decompress = decompress
 
 return Box
