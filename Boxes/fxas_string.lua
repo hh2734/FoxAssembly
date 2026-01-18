@@ -166,11 +166,14 @@ end
 
 function Box.swapcase(STR)
 	local result = {}
+	local str
 	for s in STR:gmatch(".") do
-		if isAlpha(s) then
-			s = isLower(a) and upper(s) or lower(s)
+		str = s
+		if isAlpha(str) then
+			k = isLower(a) and upper(str) or lower(str)
 		end
-		result[#result + 1] = s
+		result[#result + 1] = str
+		str = nil
 	end
 	return table.concat(result)
 end
@@ -310,25 +313,27 @@ function Box.switchlayout(STR)
 		{ "Ь", "M" }, { "Ы", "S" }, { "Ъ", "}" },
 		{ "Э", "\"" }, { "Ю", ">" }, { "Я", "Z" }
 	}
-
+	local str
 	for l in STR:gmatch(".") do
+		str = l
 		local fined = false
 		for _, v in ipairs(t) do
-			if l == v[b and 2 or 1] then
-				l = v[b and 1 or 2]
+			if str == v[b and 2 or 1] then
+				str = v[b and 1 or 2]
 				fined = true
 				break
 			end
 		end
 		if not fined then
 			for _, v in ipairs(t) do
-				if l == v[b and 1 or 2] then
-					l = v[b and 2 or 1]
+				if str == v[b and 1 or 2] then
+					str = v[b and 2 or 1]
 					break
 				end
 			end
 		end
-		result = (result .. l)
+		result = (result .. str)
+		str = nil
 	end
 	return result
 end

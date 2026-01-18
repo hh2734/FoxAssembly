@@ -8,7 +8,7 @@
 
 _config = {
 	package = "fxas.foxbox.app",
-	version = 2.13,
+	version = 2.2,
 	path = arg[0]:gsub("FoxBox.lua$","").."FoxAssembly",
 	deps = nil
 }
@@ -36,7 +36,7 @@ local function mc(arg1, ...)
 	return false
 end
 
-local DocType_VERSION = "Beta X1"
+local DocType_VERSION = "Beta X2"
 
 local op = arg[1]
 local pkg = arg[#arg]
@@ -65,6 +65,7 @@ Box._config = {
 --> ============   CONFIG   ============ <--
 
 
+unpack = unpack or table.unpack
 syslib = ...
 if type(syslib) ~= "table" then
 	return Box
