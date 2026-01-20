@@ -85,7 +85,7 @@ local function randomseed(...)
 	numx = numx + 0.1788234435435242
 end
 
-function Box.random(a, b, ...)
+function Box.number(a, b, ...)
 	numx = numx + 17.8273612
 	randomseed(...)
 	return math.random(a, b)
