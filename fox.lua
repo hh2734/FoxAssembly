@@ -3,6 +3,7 @@ local fox = {}
 fox._VERSION = 1.1
 
 local printr
+
 local path
 
 local function err(text)
@@ -38,6 +39,7 @@ do
 			end
 			
 			if processing[package] then
+				--print("Skipping already processing package: "..package)
 				goto continue
 			end
 			
@@ -74,7 +76,7 @@ do
 			elseif ok and type(args[1]) == "table" then
 				for k, v in pairs(args) do
 					if v[1] == "~=" then
-						_, ok_v = sysfox.safeload("return not ("..dep._config.version..(v[2] or "")..")", true)
+						_, ok_v = sysfox.load("return not ("..dep._config.version..(v[2] or "")..")", true)
 					else
 						_, ok_v = sysfox.safeload("return "..dep._config.version..(v[1] or "")..(v[2] or ""), true)
 					end
@@ -92,7 +94,7 @@ do
 					end
 				end
 			elseif type(dep) == "string" and not ok then
-				err("\n\n"..config.package..": Error!\nCan't load '"..package.."'!\n\nError text:\n"..dep.."\n\nYou can try to fix it!")
+				err("\n\n"..config.package..": Error!\nCan't load '"..package.."'!\n\nError text:\n"..dep.."\n\nYou can try to fix it! (if you want~)")
 			end
 			
 			processing[package] = nil

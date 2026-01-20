@@ -381,7 +381,7 @@ function Box.decrypt(ciphertext_hex, key)
 end
 
 function Box.key(seed)
-	math.randomseed(seed)
+	seed = seed and math.randomseed(seed) or nil
 	return randstr(32)
 end
 

@@ -267,8 +267,7 @@ function Box.regescape(STR)
 end
 
 function Box.shuffle(STR, seed)
-	local time
-	if not os then time = function() return math.random() end else time = os.time end
+	local time = os and os.time or function() return math.random() end
 	math.randomseed(seed or clock())
 	local arr, new = array(STR), {}
 	for i = 1, #arr do
