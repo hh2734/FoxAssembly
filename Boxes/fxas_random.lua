@@ -91,8 +91,8 @@ function Box.number(a, b, ...)
 	return math.random(a, b)
 end
 
-local function randstr(len)
-	randomseed(len)
+local function randstr(len, seed)
+	seed = seed and 1 or randomseed(len)
 	local res = ""
 	for i = 1, len do
 		res = res .. string.char(math.random(0, 255))
@@ -100,11 +100,11 @@ local function randstr(len)
 	return res
 end
 
-local function randstr2(len, charset, a)
+local function randstr2(len, seed, charset, a)
 	local txt = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	charset = a and txt..charset or (charset or txt)
 	txt = nil
-	randomseed(len, charset, a)
+	seed = seed and 1 or randomseed(len, charset, a)
 	local res = ""
 	for i = 1, len do
 		local s = math.random(1, #charset)
