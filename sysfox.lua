@@ -11,7 +11,6 @@ local function err(text)
 	if os then os.exit() else error() end
 end
 
-
 local function split(str, delimiter)
     if type(str) ~= "string" then return {} end
     delimiter = delimiter or "%s"
@@ -24,8 +23,6 @@ local function split(str, delimiter)
     end
     return result
 end
-
-sys_lib.split = split
 
 local function table_path(path_parts, start_table, last)
     local current = start_table or _G
@@ -44,8 +41,6 @@ local function table_path(path_parts, start_table, last)
     return current
 end
 
-sys_lib.table_path = table_path
-
 function sys_lib.import(name, as)
 	local msg = "\n\nimport() failure\n"..name..[[: - Package not found!]].."\n"..[[Add '["]]..name..[["] = {">=", 1.0}' to _config.deps!]].."\n"
 	local text = FoxRAM.read("packages/"..name)
@@ -53,7 +48,7 @@ function sys_lib.import(name, as)
 	--print(sys_lib)
 	local ok, module = pcall(load(text), sys_lib)
 	if ok then
-		local arr = as and split(as) or split(name, "%.")
+		local arr = as and split(as, "%.") or split(name, "%.")
 		table_path(arr, nil, module)
 	else
 		err("\n"..module)
@@ -76,5 +71,12 @@ function sys_lib.safeload(text, nil_env, args)
 	if nil_env then return pcall(load(text, nil, "bt", {}), unpack(args)) end
 	return pcall(load(text), unpack(args))
 end
+
+function sys_lib.ram_usage()
+	return collectgarbage("count")
+end
+
+sys_lib.split = split
+sys_lib.table_path = table_path
 
 return sys_lib
